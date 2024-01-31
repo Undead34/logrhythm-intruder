@@ -42,7 +42,7 @@ def get_region(code: str):
     else:
         return "api.xdr.trendmicro.com"
 
-def getTokenDays(expiration: str) -> int:
+def get_token_days(expiration: str) -> int:
     """Returns the number of days until the token expires
     Args:
         token (str): The token to check

@@ -2,40 +2,30 @@ import os
 
 from .constants import paths
 from .loggers import console
-from .trend_vision_one import TrendVisionOne
 from .errors import NetworkError, FileSystemError
 
-def _network_test():
+def _network_test(check_connection_func: callable):
     try:
-        console.debug("Comprobando conexión con Trend Vision One...")
-        status_code, message = TrendVisionOne.checkAPIStatus()
+        console.debug("Comprobando conexión...")
+        status_code, message = check_connection_func
         
         if status_code == 401:
-            raise NetworkError(
-                "[URGENTE]!!! El token de Trend Vision One ha expirado o no es válido.\n"
-                "Por favor, actualice el token en el archivo de configuración. (.env)\n"
-                "\n"
-                "No se ha podido iniciar sesión en el servidor de Trend Vision One.\n"
-                "Por favor, compruebe que el token es correcto.\n"
-                "\n"
-                "DETALLES:\n"
-                f"{message}"
-            )
+            raise NetworkError("El token de acceso es inválido.")
         elif status_code != 200:
             print(message)
         else:
-            console.debug("Conexión con Trend Vision One establecida.")
+            console.debug("Conexión con el endpoint establecida.")
             return True
     except NetworkError as e:
         raise e
     except Exception as e:
-        raise NetworkError("No se ha podido establecer conexión con Trend Vision One.\nPor favor, compruebe su conexión a Internet.")
+        raise NetworkError("No se ha podido establecer conexión con el endpoint.\nPor favor, compruebe su conexión a Internet.")
     
     return False
 
 def _paths_test():
     try:
-        console.debug("Comprobando directorios necesarios para el funcionamiento de Trend Vision One...")
+        console.debug("Comprobando directorios...")
         
         for key, value in paths.items():
             if not os.path.exists(value):
@@ -47,13 +37,13 @@ def _paths_test():
     except FileSystemError as e:
         raise e
     except Exception as e:
-        raise FileSystemError("No se han podido crear los directorios necesarios para el funcionamiento de Trend Vision One.")
+        raise FileSystemError("No se han podido crear los directorios necesarios para el funcionamiento del programa.")
     
     return True
 
-def test():
+def test(test_network: callable):
     try:
-        _network_test()
+        _network_test(test_network)
         _paths_test()
         return True
     except NetworkError as e:

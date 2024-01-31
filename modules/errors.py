@@ -28,8 +28,8 @@ class TokenExpiredError(Exception):
     def __init__(self):
         self.message = (
             "Por favor, actualice el token en el archivo de configuración. (.env)\n"
-            "Para obtener su token, vaya al siguiente enlace: https://automation.trendmicro.com/xdr/api-v3#tag/API-Keys\n"
-            "El token de Trend Vision One ha expirado."
+            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication\n"
+            "El token API ha expirado."
         )
         super().__init__(self.message)
 
@@ -37,7 +37,7 @@ class TokenNotSetError(Exception):
     def __init__(self):
         self.message = (
             "Por favor, establezca el token en el archivo de configuración. (.env)\n"
-            "Para obtener su token, vaya al siguiente enlace: https://automation.trendmicro.com/xdr/api-v3#tag/API-Keys\n"
-            "El token de Trend Vision One no está establecido."
+            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication\n"
+            "El token API no está establecido."
         )
         super().__init__(self.message)

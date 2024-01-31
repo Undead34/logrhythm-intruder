@@ -4,7 +4,7 @@ import os
 from .constants import paths
 from .loggers import console
 
-def isfirstStart():
+def is_first_start():
     firstStart = False
 
     for key, value in paths.items():
