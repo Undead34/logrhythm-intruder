@@ -38,8 +38,8 @@ def bootstrap():
         
         # If expiration date is less than current date + 7 days, the token will expire soon
         elif expiration <= 7 and expiration > 0: 
-            console.warn("Por favor, actualice el token en el archivo de configuración. (.env)\n"
-            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication\n",
+            console.warn("Por favor, actualice el token en el archivo de configuración. (.env) "
+            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication ",
             "El token API expirará en menos de 7 días.")
     else:
         # If token is not set or is NULL raise warning

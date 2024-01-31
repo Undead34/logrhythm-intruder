@@ -7,21 +7,18 @@ from .errors import NetworkError, FileSystemError
 def _network_test(check_connection_func: callable):
     try:
         console.debug("Comprobando conexión...")
-        status_code, message = check_connection_func
+        status_code, message = check_connection_func()
         
         if status_code == 401:
             raise NetworkError("El token de acceso es inválido.")
         elif status_code != 200:
             print(message)
         else:
-            console.debug("Conexión con el endpoint establecida.")
-            return True
+            console.debug(message)
     except NetworkError as e:
         raise e
     except Exception as e:
-        raise NetworkError("No se ha podido establecer conexión con el endpoint.\nPor favor, compruebe su conexión a Internet.")
-    
-    return False
+        raise NetworkError("No se ha podido establecer conexión con el endpoint. Por favor, compruebe su conexión a Internet.")
 
 def _paths_test():
     try:
@@ -38,8 +35,6 @@ def _paths_test():
         raise e
     except Exception as e:
         raise FileSystemError("No se han podido crear los directorios necesarios para el funcionamiento del programa.")
-    
-    return True
 
 def test(test_network: callable):
     try:

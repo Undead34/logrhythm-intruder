@@ -36,8 +36,7 @@ class TokenExpiredError(Exception):
 class TokenNotSetError(Exception):
     def __init__(self):
         self.message = (
-            "Por favor, establezca el token en el archivo de configuración. (.env)\n"
-            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication\n"
-            "El token API no está establecido."
+            "Por favor, establezca el token en el archivo de configuración. (.env) "
+            "Para obtener su token, vaya al siguiente enlace: https://developers.intruder.io/docs/authentication"
         )
         super().__init__(self.message)
