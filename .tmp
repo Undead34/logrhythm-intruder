@@ -1,0 +1,288 @@
+
+# start_oat = self._getSegDiff(config["oat"]["timedelta"])
+# end_oat = self._getSegDiff(0)
+# top_oat = config["oat"]["top"]
+# self.get_oat(start_oat, end_oat, top_oat)
+# self.getObservedAttackTechniques()
+# self.getDetectionData()
+
+# from datetime import datetime, timezone, timedelta
+# import requests, json
+
+# from .loggers import TrendMicroLogger, console
+# from .constants import config
+# from .parsers import parseOATEvents
+# from .utils import get_region, get_datetime_param
+
+# """
+#     Clase que se encarga de obtener los eventos arronjados por Trend Vision One
+#     y guardarlos en el archivo de logs.
+# """
+
+
+# class TrendVisionOne:
+#     def __init__(self):
+#         self.logger = TrendMicroLogger()
+
+#         start_oat = self._getSegDiff(config["oat"]["timedelta"])
+#         end_oat = self._getSegDiff(0)
+#         top_oat = config["oat"]["top"]
+#         self.get_oat(start_oat, end_oat, top_oat)
+
+#         # self.getObservedAttackTechniques()
+#         # self.getDetectionData()
+
+#     def get_oat(self, start=None, end=None, top=None):
+#         params = {}
+#         if start is not None:
+#             params["detectedStartDateTime"] = get_datetime_param(start)
+#         if end is not None:
+#             params["detectedEndDateTime"] = get_datetime_param(end)
+#         if top is not None:
+#             params["top"] = top
+#         return self.get_items("/v3.0/oat/detections", params=params)
+
+#     def get_items(self, url_path, params=None, headers=None):
+#         items = []
+#         next_link = None
+
+#         while True:
+#             if next_link is None:
+#                 r = self.fetch(url_path, **kwargs)
+#             else:
+#                 r = self.fetch(next_link, **{"headers": kwargs.get("headers", {})})
+#             items.extend(r["items"])
+#             if "nextLink" not in r:
+#                 break
+#             next_link = r["nextLink"]
+
+#         return items
+
+#     def fetch(
+#         self, url_path, use_token=True, query_params: dict = {}, headers: dict = {}
+#     ):
+#         url_base = "https://" + get_region(config["api"]["region"])
+#         token = config["api"]["token"]
+
+#         if use_token:
+#             headers.update(
+#                 {
+#                     "Authorization": "Bearer " + token,
+#                 }
+#             )
+
+#         r = requests.get(url_base + url_path, params=query_params, headers=headers)
+
+#         if 200 == r.status_code:
+#             if "application/json" in r.headers.get("Content-Type", ""):
+#                 return r.json()
+#             return r.content
+
+#         raise RuntimeError(
+#             f"Request unsuccessful (GET {url_path}):" f" {r.status_code} {r.text}"
+#         )
+
+#     def getDetectionData(self):
+#         """Get a List of Data Detections from Vision One with a TMV1_filter necessary
+#         https://automation.trendmicro.com/xdr/api-v3#tag/Search/paths/~1v3.0~1search~1detections/get
+#         """
+
+#         console.debug("Comenzando la obtención de Detection Data events...")
+
+#         query_params = {
+#             # "startDateTime": "2023-04-05T08:22:37Z",
+#             # "endDateTime": "2023-04-06T08:22:37Z",
+#             # "top": 5000,
+#             # "select": "empty",
+#             # "mode": "default",
+#         }
+
+#         headers = {
+#             # "TMV1-Query": "YOUR_QUERY (string)"
+#         }
+
+#         events = self._fetchTrendAPI(
+#             "/v3.0/search/detections", query_params=query_params, headers=headers
+#         )
+
+#         if isinstance(events, dict):
+#             print(json.dumps(events, indent=4))
+#         else:
+#             print(events)
+
+#     def getObservedAttackTechniques(self):
+#         try:
+#             console.debug("Obteniendo logs de Observed Attack Techniques events...")
+
+#             q = {
+#                 "detectedStartDateTime": self._getSegDiff(config["oat"]["timedelta"]),
+#                 "detectedEndDateTime": self._getSegDiff(0),
+#                 "top": config["oat"]["top"],
+#             }
+
+#             headers = {
+#                 "TMV1-Filter": "(riskLevel eq 'low') or (riskLevel eq 'medium') or (riskLevel eq 'high') or (riskLevel eq 'critical')",  # Filtros
+#             }
+
+#             events = self._fetchTrendAPI(
+#                 "/v3.0/oat/detections", query_params=q, headers=headers
+#             )
+
+#             logs = parseOATEvents(events)
+
+#             console.debug("Saving OAT detections...")
+#             for log in logs:
+#                 self.logger.oat(log)
+
+#             console.debug("Tarea completada.")
+#         except Exception as e:
+#             console.error(e)
+
+#     @staticmethod
+#     def checkAPIStatus() -> bool:
+#         url_base = "https://" + get_region(config["api"]["region"])
+#         url_path = "/v3.0/healthcheck/connectivity"
+#         token = config["api"]["token"]
+
+#         query_params = {}
+#         headers = {"Authorization": "Bearer " + token}
+
+#         r = requests.get(url_base + url_path, params=query_params, headers=headers)
+#         message = ""
+#         message += f"Status Code: {r.status_code}\n"
+
+#         for k, v in r.headers.items():
+#             message += f"{k}: {v}\n"
+
+#         if "application/json" in r.headers.get("Content-Type", "") and len(r.content):
+#             message += json.dumps(r.json(), indent=4)
+#         else:
+#             message += r.text
+
+#         return r.status_code, message
+
+#     def _fetchTrendAPI(
+#         self, url_path: str, query_params: dict = {}, headers: dict = {}
+#     ):
+#         try:
+#             url_base = "https://" + get_region(config["api"]["region"])
+#             url_path = "/v3.0/oat/detections"
+#             token = config["api"]["token"]
+
+#             headers = {
+#                 "Authorization": "Bearer " + token,
+#             }
+
+#             headers.update(headers)
+
+#             r = requests.get(url_base + url_path, params=query_params, headers=headers)
+
+#             console.debug(r.status_code)
+
+#             for k, v in r.headers.items():
+#                 console.debug(f"{k}: {v}")
+#             console.debug("")
+
+#             if "application/json" in r.headers.get("Content-Type", "") and len(r.content):
+#                 return r.json()
+#             else:
+#                 return r.text
+#         except requests.Timeout as e:
+#             console.error("Timeout error:", e)
+#         except Exception as e:
+#             console.error(e)
+
+#     def _getSegDiff(self, seconds: int):
+#         diff: datetime = datetime.now(tz=timezone.utc) - timedelta(seconds=seconds)
+#         return diff.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+    # def getDetectionData(self):
+    #     """Get a List of Data Detections from Vision One with a TMV1_filter necessary
+    #     https://automation.trendmicro.com/xdr/api-v3#tag/Search/paths/~1v3.0~1search~1detections/get
+    #     """
+
+    #     console.debug("Comenzando la obtención de Detection Data events...")
+
+    #     query_params = {
+    #         # "startDateTime": "2023-04-05T08:22:37Z",
+    #         # "endDateTime": "2023-04-06T08:22:37Z",
+    #         # "top": 5000,
+    #         # "select": "empty",
+    #         # "mode": "default",
+    #     }
+
+    #     headers = {
+    #         # "TMV1-Query": "YOUR_QUERY (string)"
+    #     }
+
+    #     events = self._fetchTrendAPI(
+    #         "/v3.0/search/detections", query_params=query_params, headers=headers
+    #     )
+
+    #     if isinstance(events, dict):
+    #         print(json.dumps(events, indent=4))
+    #     else:
+    #         print(events)
+
+    # def getObservedAttackTechniques(self):
+    #     try:
+    #         q = {
+    #             "detectedStartDateTime": self._get_deltatime(
+    #                 config["oat"]["timedelta"]
+    #             ),
+    #             "detectedEndDateTime": self._get_deltatime(0),
+    #             "top": config["oat"]["top"],
+    #         }
+
+    #         headers = {
+    #             "TMV1-Filter": "(riskLevel eq 'low') or (riskLevel eq 'medium') or (riskLevel eq 'high') or (riskLevel eq 'critical')",  # Filtros
+    #         }
+
+    #         events = self._fetchTrendAPI(
+    #             "/v3.0/oat/detections", query_params=q, headers=headers
+    #         )
+
+    #         logs = parseOATEvents(events)
+
+    #         console.debug("Saving OAT detections...")
+    #         for log in logs:
+    #             self.logger.oat(log)
+
+    #         console.debug("Tarea completada.")
+    #     except Exception as e:
+    #         console.error(e)
+
+
+    # def _fetchTrendAPI(
+    #     self, url_path: str, query_params: dict = {}, headers: dict = {}
+    # ):
+    #     try:
+    #         url_base = "https://" + get_region(config["api"]["region"])
+    #         url_path = "/v3.0/oat/detections"
+    #         token = config["api"]["token"]
+
+    #         headers = {
+    #             "Authorization": "Bearer " + token,
+    #         }
+
+    #         headers.update(headers)
+
+    #         r = requests.get(url_base + url_path, params=query_params, headers=headers)
+
+    #         console.debug(r.status_code)
+
+    #         for k, v in r.headers.items():
+    #             console.debug(f"{k}: {v}")
+    #         console.debug("")
+
+    #         if "application/json" in r.headers.get("Content-Type", "") and len(
+    #             r.content
+    #         ):
+    #             return r.json()
+    #         else:
+    #             return r.text
+    #     except requests.Timeout as e:
+    #         console.error("Timeout error:", e)
+    #     except Exception as e:
+    #         console.error(e)
