@@ -39,8 +39,7 @@ config = {
 base_path = os.path.realpath(os.path.join(os.path.curdir, "logs"))
 paths = {
     "logs": base_path,
-    "oat": os.path.join(base_path, "Observed Attack Techniques"),
-    "audit": os.path.join(base_path, "Audit Logs"),
-    "detection": os.path.join(base_path, "Detection Data"),
-    "workbench": os.path.join(base_path, "Workbench"),
+    "issues": os.path.join(base_path, "Issues"),
+    "occurrences": os.path.join(base_path, "Occurrences"),
+    "scanner_output": os.path.join(base_path, "Scanner Output"),
 }
